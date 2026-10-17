@@ -21,7 +21,7 @@ from qutebrowser.qt.core import pyqtSignal, pyqtSlot, QTimer, QUrl, QPoint
 from qutebrowser.config import config
 from qutebrowser.keyinput import modeman
 from qutebrowser.mainwindow import tabwidget, mainwindow
-from qutebrowser.browser import signalfilter, browsertab, history
+from qutebrowser.browser import signalfilter, browsertab, history, tab as _tab_mod
 from qutebrowser.utils import (log, usertypes, utils, qtutils,
                                urlutils, message, jinja, version)
 from qutebrowser.misc import quitter, objects
@@ -195,8 +195,8 @@ class TabbedBrowser(QWidget):
     cur_caret_selection_toggled = pyqtSignal(browsertab.SelectionState)
     close_window = pyqtSignal()
     resized = pyqtSignal('QRect')
-    current_tab_changed = pyqtSignal(browsertab.AbstractTab)
-    new_tab = pyqtSignal(browsertab.AbstractTab, int)
+    current_tab_changed = pyqtSignal(_tab_mod.Tab)
+    new_tab = pyqtSignal(_tab_mod.Tab, int)
     shutting_down = pyqtSignal()
 
     def __init__(self, *, win_id, private, parent=None):
@@ -379,13 +379,13 @@ class TabbedBrowser(QWidget):
             tab.history_item_triggered.connect(
                 history.web_history.add_from_tab)
 
-    def _current_tab(self) -> browsertab.AbstractTab:
+    def _current_tab(self) -> _tab_mod.Tab:
         """Get the current browser tab.
 
         Note: The assert ensures the current tab is never None.
         """
         tab = self.widget.currentWidget()
-        assert isinstance(tab, browsertab.AbstractTab), tab
+        assert isinstance(tab, _tab_mod.Tab), tab
         return tab
 
     def _window(self) -> QWidget:
@@ -397,14 +397,14 @@ class TabbedBrowser(QWidget):
         assert window is not None
         return window
 
-    def _tab_by_idx(self, idx: int) -> Optional[browsertab.AbstractTab]:
+    def _tab_by_idx(self, idx: int) -> Optional[_tab_mod.Tab]:
         """Get a browser tab by index.
 
         If no tab was found at the given index, None is returned.
         """
         tab = self.widget.widget(idx)
         if tab is not None:
-            assert isinstance(tab, browsertab.AbstractTab), tab
+            assert isinstance(tab, _tab_mod.Tab), tab
         return tab
 
     def current_url(self):
@@ -645,9 +645,9 @@ class TabbedBrowser(QWidget):
             window.show()
             return tab
 
-        tab = browsertab.create(win_id=self._win_id,
-                                private=self.is_private,
-                                parent=self.widget)
+        tab = browsertab.create_tab(win_id=self._win_id,
+                                    private=self.is_private,
+                                    parent=self.widget)
         self._connect_tab_signals(tab)
 
         if idx is None:

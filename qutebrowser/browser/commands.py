@@ -333,6 +333,75 @@ class CommandDispatcher:
                 else:
                     curtab.load_url(cur_url)
 
+    @cmdutils.register(instance='command-dispatcher', name='vsplit',
+                       maxsplit=0, scope='window')
+    @cmdutils.argument('url', completion=urlmodel.url)
+    def vsplit(self, url: str = None) -> None:
+        """Open a new pane to the right of the current pane.
+
+        Args:
+            url: The URL to open in the new pane. Falls back to the
+                 configured start page if omitted.
+        """
+        self._do_split(Qt.Orientation.Horizontal, url)
+
+    @cmdutils.register(instance='command-dispatcher', name='split',
+                       maxsplit=0, scope='window')
+    @cmdutils.argument('url', completion=urlmodel.url)
+    def split(self, url: str = None) -> None:
+        """Open a new pane below the current pane.
+
+        Args:
+            url: The URL to open in the new pane. Falls back to the
+                 configured start page if omitted.
+        """
+        self._do_split(Qt.Orientation.Vertical, url)
+
+    def _do_split(self, orientation: Qt.Orientation,
+                  url: Optional[str]) -> None:
+        if url is None:
+            target = config.val.url.default_page
+        else:
+            target = self._parse_url(url)
+            if target is None:
+                return
+        self._current_widget().split(orientation, target)
+
+    @cmdutils.register(instance='command-dispatcher', name='pane-close',
+                       scope='window')
+    def pane_close(self) -> None:
+        """Close the currently focused pane.
+
+        If this was the only pane in the tab, closes the tab instead.
+        """
+        tab = self._current_widget()
+        if not tab.close_active_pane():
+            self._tabbed_browser.close_tab(tab)
+
+    @cmdutils.register(instance='command-dispatcher', name='pane-left',
+                       scope='window')
+    def pane_left(self) -> None:
+        """Focus the pane to the left of the current one."""
+        self._current_widget().focus_direction('left')
+
+    @cmdutils.register(instance='command-dispatcher', name='pane-right',
+                       scope='window')
+    def pane_right(self) -> None:
+        """Focus the pane to the right of the current one."""
+        self._current_widget().focus_direction('right')
+
+    @cmdutils.register(instance='command-dispatcher', name='pane-up',
+                       scope='window')
+    def pane_up(self) -> None:
+        """Focus the pane above the current one."""
+        self._current_widget().focus_direction('up')
+
+    @cmdutils.register(instance='command-dispatcher', name='pane-down',
+                       scope='window')
+    def pane_down(self) -> None:
+        """Focus the pane below the current one."""
+        self._current_widget().focus_direction('down')
+
     def _parse_url(self, url, *, force_search=False):
         """Parse a URL or quickmark or search query.
 

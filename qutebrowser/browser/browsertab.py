@@ -48,12 +48,9 @@ _WidgetType = Union["WebView", "WebEngineView"]
 def create(win_id: int,
            private: bool,
            parent: QWidget = None) -> 'AbstractTab':
-    """Get a QtWebKit/QtWebEngine tab object.
+    """Get a QtWebKit/QtWebEngine pane (a WebView-wrapping AbstractTab).
 
-    Args:
-        win_id: The window ID where the tab will be shown.
-        private: Whether the tab is a private/off the record tab.
-        parent: The Qt parent to set.
+    For a Tab (QTabWidget child holding one or more Panes), use create_tab.
     """
     # Importing modules here so we don't depend on QtWebEngine without the
     # argument and to avoid circular imports.
@@ -68,6 +65,15 @@ def create(win_id: int,
         raise utils.Unreachable(objects.backend)
     return tab_class(win_id=win_id, mode_manager=mode_manager, private=private,
                      parent=parent)
+
+
+def create_tab(win_id: int,
+               private: bool,
+               parent: QWidget = None) -> QWidget:
+    """Create a Tab containing a single initial Pane."""
+    from qutebrowser.browser import tab as tab_module
+    pane = create(win_id=win_id, private=private)
+    return tab_module.Tab(pane, parent=parent)
 
 
 class WebTabError(Exception):

@@ -3695,6 +3695,13 @@ bindings.default:
       <Ctrl-Shift-N>: open -p
       d: tab-close
       <Ctrl-W>: tab-close
+      "`h": pane-left
+      "`j": pane-down
+      "`k": pane-up
+      "`l": pane-right
+      "`v": vsplit
+      "`s": split
+      "`c": pane-close
       <Ctrl-Shift-W>: close
       D: tab-close -o
       co: tab-only
@@ -3751,7 +3758,7 @@ bindings.default:
       i: mode-enter insert
       v: mode-enter caret
       V: mode-enter caret ;; selection-toggle --line
-      "`": mode-enter set_mark
+      # "`": mode-enter set_mark   # repurposed as pane prefix in normal mode
       "'": mode-enter jump_mark
       yy: yank
       yY: yank -s

@@ -19,7 +19,7 @@ from qutebrowser.qt.gui import QIcon, QPalette, QColor
 from qutebrowser.utils import qtutils, objreg, utils, usertypes, log
 from qutebrowser.config import config, stylesheet
 from qutebrowser.misc import objects, debugcachestats
-from qutebrowser.browser import browsertab
+from qutebrowser.browser import browsertab, tab as _tab_mod
 
 
 class TabWidget(QTabWidget):
@@ -79,11 +79,11 @@ class TabWidget(QTabWidget):
         assert isinstance(bar, TabBar), bar
         return bar
 
-    def _tab_by_idx(self, idx: int) -> Optional[browsertab.AbstractTab]:
+    def _tab_by_idx(self, idx: int) -> Optional[_tab_mod.Tab]:
         """Get the tab at the given index."""
         tab = self.widget(idx)
         if tab is not None:
-            assert isinstance(tab, browsertab.AbstractTab), tab
+            assert isinstance(tab, _tab_mod.Tab), tab
         return tab
 
     def set_tab_indicator_color(self, idx, color):
